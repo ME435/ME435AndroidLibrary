@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import root.gast.speech.SpeechRecognizingActivity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,7 +18,7 @@ import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
-public class AccessoryActivity extends SpeechRecognizingActivity {
+public class AccessoryActivity extends Activity {
 
   private static final String TAG = AccessoryActivity.class.getSimpleName();
   private PendingIntent mPermissionIntent;
@@ -194,17 +193,4 @@ public class AccessoryActivity extends SpeechRecognizingActivity {
     super.onDestroy();
     unregisterReceiver(mUsbReceiver);
   }
-  
-  // ------------ Speech area --------------------------
-  // Intentionally not implemented here.  See superclass.
-  @Override
-  protected void speechNotAvailable() {}
-  @Override
-  protected void directSpeechNotAvailable() {}
-  @Override
-  protected void languageCheckResult(String languageToUse) {}
-  @Override
-  protected void receiveWhatWasHeard(List<String> heard, float[] confidenceScores) {}
-  @Override
-  protected void recognitionFailure(int errorCode) {}
 }

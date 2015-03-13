@@ -11,17 +11,11 @@ import android.view.WindowManager;
 
 /** 
  * This class is intended to be subclasses by your main activity. It subclasses
- * the SpeechAccessoryActivity so you get all of those features. Let's review
- * the features available due to AccessoryActivity and SpeechAccessoryActivity.
+ * the AccessoryActivity so you get all of those features. Let's review
+ * the features available due to AccessoryActivity.
  * 
  * From AccessoryActivity: You can call sendCommand and pass a String to send to
  * Arduino You can override onCommandReceived to receive commands from Arduino.
- * 
- * From SpeechAccessoryActivity: You can call startListening to well, start
- * listening for voice You can override receiveWhatWasHeard to get raw data. OR
- * you can override onVoiceCommand to get an angle/distance command. (in short
- * SpeechAccessoryActivity does some parsing of the raw data to do a basic
- * parsing task, but you could use voice however you like.)
  * 
  * In addition to the features from the superclasses, this Activity creates
  * other library helpers like FieldGps, FieldOrientation, and
@@ -42,7 +36,7 @@ import android.view.WindowManager;
  * 
  * @author fisherds@gmail.com (Dave Fisher)
  * */
-public class RobotActivity extends SpeechAccessoryActivity implements FieldGpsListener, FieldOrientationListener {
+public class RobotActivity extends AccessoryActivity implements FieldGpsListener, FieldOrientationListener {
 
   /** Field GPS instance that gives field feet and field bearings. */
   protected FieldGps mFieldGps;
@@ -262,13 +256,6 @@ public class RobotActivity extends SpeechAccessoryActivity implements FieldGpsLi
   @Override
   public void onSensorChanged(double fieldHeading, float[] orientationValues) {
     mCurrentSensorHeading = fieldHeading;
-  }
-
-  @Override
-  protected void onVoiceCommand(int angle, int distance) {
-    super.onVoiceCommand(angle, distance);
-    mVoiceCommandAngle = angle;
-    mVoiceCommandDistance = distance;
   }
 
   @Override
