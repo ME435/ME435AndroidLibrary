@@ -125,10 +125,6 @@ public class RobotActivity extends AccessoryActivity implements FieldGpsListener
   /** Magic tool we use to execute code after a delay. */
   protected Handler mCommandHandler = new Handler();
 
-  // Voice
-  /** Most recent voice command angle and distance values. */
-  protected int mVoiceCommandAngle, mVoiceCommandDistance;
-
   // Field GPS locations
   /** Latitude and Longitude values of the field home bases. */
   public static final double RED_HOME_LATITUDE = 39.485297; // Middle of the end zone near the SRC
@@ -153,9 +149,6 @@ public class RobotActivity extends AccessoryActivity implements FieldGpsListener
     // Assume you are on the red team to start the app (can be changed later).
     mFieldGps = new FieldGps(this, RED_HOME_LATITUDE, RED_HOME_LONGITUDE, BLUE_HOME_LATITUDE, BLUE_HOME_LONGITUDE);
     mFieldOrientation = new FieldOrientation(this, BLUE_HOME_LATITUDE, BLUE_HOME_LONGITUDE, RED_HOME_LATITUDE, RED_HOME_LONGITUDE);
-
-    // Prepare for TextToSpeech
-    mTts = new TextToSpeechHelper(this);
   }
 
   public void setTeamToRed(boolean isRed) {
@@ -261,6 +254,7 @@ public class RobotActivity extends AccessoryActivity implements FieldGpsListener
   @Override
   protected void onStart() {
     super.onStart();
+    mTts = new TextToSpeechHelper(this);
     mTimer = new Timer();
     mTimer.scheduleAtFixedRate(new TimerTask() {
       @Override
@@ -279,6 +273,7 @@ public class RobotActivity extends AccessoryActivity implements FieldGpsListener
   @Override
   protected void onStop() {
     super.onStop();
+    mTts.shutdown();
     mTimer.cancel();
     mTimer = null;
     mFieldOrientation.unregisterListener();

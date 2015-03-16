@@ -137,38 +137,6 @@ public class NavUtils {
 	}
 
 	/**
-	 * Method for converting a voice command angle and distance to an arc
-	 * radius.
-	 * 
-	 * @param angle
-	 *            Angle given in the voice command. When I ride on the robot I
-	 *            think of negative as left. So 0 is straight ahead, -30 is a
-	 *            left turn, 150 would be a supper hard right turn.
-	 * 
-	 * @param distance
-	 *            Distance in feet from the robot to the target.
-	 * @param result
-	 *            A boolean to indicate if the Arc Radius strategy is
-	 *            recommended. An arc can always be found, but imagine you were
-	 *            1 foot away driving away, the arc radius strategy would have
-	 *            you drive a VERY large radius circle instead of just turning
-	 *            around (or backing up). In general only angles already
-	 *            pointing towards (plus or minus 70-90 degrees) work well with
-	 *            the Arc Radius strategy.
-	 * @return True if the arc radius strategy is recommended, false otherwise.
-	 */
-	public static boolean calculateArcForVoiceCommand(int angle, int distance,
-			double[] result) {
-		double robotX = -distance * Math.cos(Math.toRadians(-angle));
-		double robotY = -distance * Math.sin(Math.toRadians(-angle));
-		double robotHeading = 0;
-		double targetX = 0;
-		double targetY = 0;
-		return calculateArc(robotX, robotY, robotHeading, targetX, targetY,
-				result);
-	}
-
-	/**
 	 * Uses the robot's X and Y and the target X and Y and determines the
 	 * heading a robot should be on to hit the target. Note, that the robot's
 	 * current heading is not required for this calculation.
