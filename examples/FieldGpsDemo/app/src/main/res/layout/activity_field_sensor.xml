@@ -1,0 +1,117 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    tools:context=".FieldSensorActivity">
+
+    <TextView
+        android:id="@+id/x_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="X:  "
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/x_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/x_label"
+        android:text="---"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/y_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/x_label"
+        android:text="Y:  "
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/y_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/x_textview"
+        android:layout_toRightOf="@id/y_label"
+        android:text="---"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/bearing_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/y_label"
+        android:text="Bearing:  "
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/bearing_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/y_textview"
+        android:layout_toRightOf="@id/bearing_label"
+        android:text="---"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/counter_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="0"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/gps_location_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:text="---"
+        android:textColor="#666"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/accuracy_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:text="---"
+        android:textColor="#666"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/speed_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@id/accuracy_textview"
+        android:layout_marginRight="50dp"
+        android:text="---"
+        android:textColor="#666"
+        android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/set_as_origin_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_above="@id/gps_location_textview"
+        android:text="Set Origin"
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/set_as_x_axis_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_above="@id/accuracy_textview"
+        android:text="Set X Axis"
+        android:textSize="30sp" />
+
+</RelativeLayout>
