@@ -106,7 +106,7 @@ public class FieldGps implements LocationListener {
    *          A context (usually an Activity) used to get the LocationManager.
    */
   public void requestLocationUpdates(Context context) {
-    requestLocationUpdates(mContext, DEFAULT_MIN_TIME_MS, DEFAULT_MIN_DISTANCE);
+    requestLocationUpdates(context, DEFAULT_MIN_TIME_MS, DEFAULT_MIN_DISTANCE);
   }
 
   /**
