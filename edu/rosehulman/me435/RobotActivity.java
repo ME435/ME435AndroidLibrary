@@ -149,6 +149,7 @@ public class RobotActivity extends AccessoryActivity implements FieldGpsListener
     // Assume you are on the red team to start the app (can be changed later).
     mFieldGps = new FieldGps(this, RED_HOME_LATITUDE, RED_HOME_LONGITUDE, BLUE_HOME_LATITUDE, BLUE_HOME_LONGITUDE);
     mFieldOrientation = new FieldOrientation(this, BLUE_HOME_LATITUDE, BLUE_HOME_LONGITUDE, RED_HOME_LATITUDE, RED_HOME_LONGITUDE);
+    mTts = new TextToSpeechHelper(this);
   }
 
   public void setTeamToRed(boolean isRed) {
@@ -254,7 +255,6 @@ public class RobotActivity extends AccessoryActivity implements FieldGpsListener
   @Override
   protected void onStart() {
     super.onStart();
-    mTts = new TextToSpeechHelper(this);
     mTimer = new Timer();
     mTimer.scheduleAtFixedRate(new TimerTask() {
       @Override
