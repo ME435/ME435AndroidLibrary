@@ -107,23 +107,24 @@ public class FieldOrientation implements SensorEventListener {
    * This function sets the current heading to a known value. This will update
    * the field bearing as necessary to make the current value correct.
    * 
-   * @param currentHeading
+   * @param currentFieldHeading
    *          The current known field heading. Note that the positive X axis is
    *          at 0 degrees.
    */
   public void setCurrentFieldHeading(double currentFieldHeading) {
-    mFieldBearing = mOrientationValues[0] + (float) currentFieldHeading;
+    mFieldBearing = getRevisedAzimuth() + (float) currentFieldHeading;
   }
 
   @Override
   public void onSensorChanged(SensorEvent event) {
     if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
       SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
-      
+
+      // From: https://github.com/gast-lib/gast-lib/blob/master/app/src/root/gast/playground/sensor/NorthFinder.java
       SensorManager.remapCoordinateSystem(mRotationMatrix,
               SensorManager.AXIS_X, SensorManager.AXIS_Z,
               mRotationMatrix);
-      
+
       SensorManager.getOrientation(mRotationMatrix, mOrientationValues);
       mOrientationValues[0] = (float) Math.toDegrees(mOrientationValues[0]);
       mOrientationValues[1] = (float) Math.toDegrees(mOrientationValues[1]);
@@ -136,7 +137,7 @@ public class FieldOrientation implements SensorEventListener {
    * Sends the onSensorChanged event to the FieldOrientationListener.
    */
   private void dispatchOnSensorChangedEvent() {
-    float fieldHeading = mFieldBearing - mOrientationValues[0];
+    float fieldHeading = mFieldBearing - getRevisedAzimuth();
     fieldHeading = normalizeAngle(fieldHeading);
     mListener.onSensorChanged(fieldHeading, mOrientationValues);
   }
@@ -154,6 +155,21 @@ public class FieldOrientation implements SensorEventListener {
     while (angle > 180.0)
       angle -= 360.0;
     return angle;
+  }
+
+
+  /**
+   * Calculates the Azimuth based on the orientation values.
+   * @return Azimuth (assuming the device is in portrait)
+   */
+  private float getRevisedAzimuth() {
+    // I have absolutely no idea why, how, or when the rotation vector sensor changed the way it works.
+    // BUT this seems to be a solution to the problem to accurately find azimuth now.
+    float revisedAzimuth = Math.abs(mOrientationValues[0]) + Math.abs(mOrientationValues[2]);
+    if (mOrientationValues[2] > 0) {
+      revisedAzimuth *= -1;
+    }
+    return revisedAzimuth;
   }
 
   // Other required methods from the LocationListener.
