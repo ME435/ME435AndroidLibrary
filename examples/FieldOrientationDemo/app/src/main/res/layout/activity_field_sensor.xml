@@ -1,0 +1,86 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    tools:context=".FieldSensorActivity">
+
+    <TextView
+        android:id="@+id/heading_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="Heading:  "
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/heading_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/heading_label"
+        android:text="---"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/raw_data_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/heading_label"
+        android:layout_marginTop="40dp"
+        android:text="Raw angles:  "
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/raw_data_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/raw_data_label"
+        android:layout_alignBaseline="@+id/raw_data_label"
+        android:text="---"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/counter_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignBaseline="@+id/heading_label"
+        android:text="---"
+        android:textSize="30sp" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/set_as_neg_30"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Set -30"
+            android:textSize="30sp"
+            android:onClick="handleSetAsNeg30"/>
+
+        <Button
+            android:id="@+id/set_as_0"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Set Zero"
+            android:textSize="30sp"
+            android:onClick="handleSetAs0" />
+
+        <Button
+            android:id="@+id/set_as_30"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Set 30"
+            android:textSize="30sp"
+            android:onClick="handleSetAs30" />
+    </LinearLayout>
+</RelativeLayout>
