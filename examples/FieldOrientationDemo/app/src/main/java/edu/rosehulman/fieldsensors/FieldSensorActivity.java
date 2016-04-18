@@ -1,7 +1,7 @@
 package edu.rosehulman.fieldsensors;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -10,7 +10,7 @@ import edu.rosehulman.fieldsensors.edu.rosehulman.me435.FieldOrientation;
 import edu.rosehulman.fieldsensors.edu.rosehulman.me435.FieldOrientationListener;
 
 
-public class FieldSensorActivity extends Activity implements FieldOrientationListener {
+public class FieldSensorActivity extends AppCompatActivity implements FieldOrientationListener {
 
     /** Field Orientation instance that gives field theta values from the sensor heading. */
     private FieldOrientation mFieldOrientation;
@@ -51,8 +51,8 @@ public class FieldSensorActivity extends Activity implements FieldOrientationLis
     public void onSensorChanged(double fieldHeading, float[] orientationValues) {
         mUpdatesCounter++;
         mCounterTextView.setText("" + mUpdatesCounter);
-        mHeadingTextView.setText(String.format("%.1f°", fieldHeading));
-        mRawDataTextView.setText(String.format("%.1f°  %.1f°  %.1f°", orientationValues[0], orientationValues[1], orientationValues[2]));
+        mHeadingTextView.setText(String.format("%.0f°", fieldHeading));
+        mRawDataTextView.setText(String.format("%.0f°  %.0f°  %.0f°", orientationValues[0], orientationValues[1], orientationValues[2]));
     }
 
     public void handleSetAsNeg30(View view) {

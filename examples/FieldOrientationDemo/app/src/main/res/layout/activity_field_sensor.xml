@@ -27,8 +27,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/heading_label"
-        android:layout_marginTop="40dp"
-        android:text="Raw angles:  "
+        android:layout_marginTop="60dp"
+        android:text="Raw:  "
         android:textSize="30sp" />
 
     <TextView
@@ -62,7 +62,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:text="Set -30"
-            android:textSize="30sp"
+            android:textSize="20sp"
             android:onClick="handleSetAsNeg30"/>
 
         <Button
@@ -71,7 +71,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:text="Set Zero"
-            android:textSize="30sp"
+            android:textSize="20sp"
             android:onClick="handleSetAs0" />
 
         <Button
@@ -80,7 +80,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:text="Set 30"
-            android:textSize="30sp"
+            android:textSize="20sp"
             android:onClick="handleSetAs30" />
     </LinearLayout>
 </RelativeLayout>
