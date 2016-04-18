@@ -1,4 +1,4 @@
-package edu.rosehulman.fieldsensors.edu.rosehulman.me435;
+package edu.rosehulman.fieldorientationdemo.edu.rosehulman.me435;
 
 import android.app.Activity;
 import android.content.Context;

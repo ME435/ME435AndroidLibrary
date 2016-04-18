@@ -1,4 +1,4 @@
-package edu.rosehulman.fieldsensors;
+package edu.rosehulman.fieldorientationdemo;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -6,8 +6,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import edu.rosehulman.fieldsensors.edu.rosehulman.me435.FieldOrientation;
-import edu.rosehulman.fieldsensors.edu.rosehulman.me435.FieldOrientationListener;
+import edu.rosehulman.fieldorientationdemo.edu.rosehulman.me435.FieldOrientation;
+import edu.rosehulman.fieldorientationdemo.edu.rosehulman.me435.FieldOrientationListener;
 
 
 public class FieldSensorActivity extends AppCompatActivity implements FieldOrientationListener {
