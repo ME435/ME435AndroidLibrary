@@ -1,8 +1,8 @@
-package edu.rosehulman.fieldsensors;
+package edu.rosehulman.fieldgpsdemo;
 
-import android.app.Activity;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -12,14 +12,14 @@ import edu.rosehulman.me435.FieldGps;
 import edu.rosehulman.me435.FieldGpsListener;
 
 
-public class FieldSensorActivity extends Activity implements FieldGpsListener {
+public class FieldSensorActivity extends AppCompatActivity implements FieldGpsListener {
 
     /** Field GPS instance that gives field feet and field bearings. */
     private FieldGps mFieldGps;
 
     /** Text views that will be updated. */
     private TextView mXTextView, mYTextView, mBearingTextView,
-            mCounterTextView, mGpsLocationTextView, mGpsAccuracyTextView, mSpeedTextView;
+            mCounterTextView, mGpsAccuracyTextView, mSpeedTextView;
 
     /** Counter for the number of updates received. */
     private long mUpdatesCounter = 0;
@@ -35,7 +35,6 @@ public class FieldSensorActivity extends Activity implements FieldGpsListener {
         mYTextView = (TextView) findViewById(R.id.y_textview);
         mBearingTextView = (TextView) findViewById(R.id.bearing_textview);
         mCounterTextView = (TextView) findViewById(R.id.counter_textview);
-        mGpsLocationTextView = (TextView) findViewById(R.id.gps_location_textview);
         mGpsAccuracyTextView = (TextView) findViewById(R.id.accuracy_textview);
         mSpeedTextView = (TextView) findViewById(R.id.speed_textview);
 
@@ -60,13 +59,18 @@ public class FieldSensorActivity extends Activity implements FieldGpsListener {
         mFieldGps.requestLocationUpdates(this); // Start receiving GPS Provider updates.
         mXTextView.setText("Waiting for first fix");
         mYTextView.setText("Waiting for first fix");
-        mBearingTextView.setText("Waiting for bearing");
+        mBearingTextView.setText("Waiting for heading");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         mFieldGps.removeUpdates(); // Stop receiving GPS Provider updates.
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        mFieldGps.requestLocationUpdates(this); // Start receiving GPS Provider updates.
     }
 
     public void onLocationChanged(double x, double y, double heading, Location location) {
@@ -80,8 +84,6 @@ public class FieldSensorActivity extends Activity implements FieldGpsListener {
             mBearingTextView.setText("---");
         }
         // Add some optional extra data.
-        mGpsLocationTextView.setText(
-                String.format("%.6f,%.6f", location.getLatitude(), location.getLongitude()));
         if (location.hasAccuracy()) {
             mGpsAccuracyTextView.setText(String.format("%.1f ft", location.getAccuracy() * FieldGps.FEET_PER_METER));
         } else {
