@@ -253,6 +253,12 @@ public class RobotActivity extends AccessoryActivity implements FieldGpsListener
   }
 
   @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    mFieldGps.requestLocationUpdates(this);
+  }
+
+  @Override
   protected void onStart() {
     super.onStart();
     mTimer = new Timer();
