@@ -35,6 +35,15 @@ public class FieldOrientation implements SensorEventListener {
   private float mFieldBearing;
 
   /**
+   * The Nexus 7 tablets need a modification to the field orientation.  It was an experimentally
+   * determined formula.  It is a hack to work around some issues, but it does the trick to fix
+   * the values on the Nexus 7 tablet.  It may cause an issue on other devices though.
+   *
+   * The default is to USE this formula as this course is designed for the Nexus 7.
+   */
+  private boolean mUseExperimentallyDeterminedFormula = true;
+
+  /**
    * Instantiate the FieldOrientationListener with a listener only. The field
    * offset angle will be set to due North (0 offset).
    * 
@@ -44,6 +53,34 @@ public class FieldOrientation implements SensorEventListener {
    */
   public FieldOrientation(FieldOrientationListener listener) {
     this(listener, 0);
+  }
+
+
+  /**
+   * Instantiate the FieldOrientationListener with a listener and value for the experimentally
+   * determined formula (see the comments above that member field for more info. The field
+   * offset angle will be set to due North (0 offset).
+   *
+   * @param listener
+   *          Listener that implements FieldOrientationListener that will be
+   *          called with updates.
+   */
+  public FieldOrientation(FieldOrientationListener listener, boolean useExperimentallyDeterminedFormula ) {
+    this(listener, 0);
+    mUseExperimentallyDeterminedFormula = useExperimentallyDeterminedFormula;
+  }
+
+  /**
+   * Construct the FieldOrientation object with a listener and known bearing.
+   *
+   * @param listener
+   *          Listener that implements FieldOrientationListener that will be
+   *          called with updates.
+   * @param fieldBearing
+   */
+  public FieldOrientation(FieldOrientationListener listener, float fieldBearing) {
+    mListener = listener;
+    mFieldBearing = fieldBearing;
   }
 
   /**
@@ -81,19 +118,6 @@ public class FieldOrientation implements SensorEventListener {
    *          Bearing of the field, degrees East of North.
    */
   public void setFieldBearing(float fieldBearing) {
-    mFieldBearing = fieldBearing;
-  }
-
-  /**
-   * Construct the FieldOrientation object with a listener and known bearing.
-   *
-   * @param listener
-   *          Listener that implements FieldOrientationListener that will be
-   *          called with updates.
-   * @param fieldBearing 
-   */
-  public FieldOrientation(FieldOrientationListener listener, float fieldBearing) {
-    mListener = listener;
     mFieldBearing = fieldBearing;
   }
 
@@ -206,7 +230,7 @@ public class FieldOrientation implements SensorEventListener {
    */
   private float getRevisedAzimuth() {
     float revisedAzimuth = mOrientationValues[0];
-    if (mUsingRotationVector) {
+    if (mUsingRotationVector && mUseExperimentallyDeterminedFormula) {
       // I have absolutely no idea why, how, or when the rotation vector sensor changed the way it works.
       // BUT this seems to be a solution to the problem to accurately find azimuth now.
       revisedAzimuth = Math.abs(mOrientationValues[0]) + Math.abs(mOrientationValues[2]);
@@ -229,5 +253,14 @@ public class FieldOrientation implements SensorEventListener {
   /** Return the field bearing used in the calculation. */
   public float getFieldBearing() {
     return mFieldBearing;
+  }
+
+
+  public boolean isUsingExperimentallyDeterminedFormula() {
+    return mUseExperimentallyDeterminedFormula;
+  }
+
+  public void setUseExperimentallyDeterminedFormula(boolean useExperimentallyDeterminedFormula) {
+    mUseExperimentallyDeterminedFormula = useExperimentallyDeterminedFormula;
   }
 }
