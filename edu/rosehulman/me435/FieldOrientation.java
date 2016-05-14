@@ -24,24 +24,12 @@ public class FieldOrientation implements SensorEventListener {
   /** Temporary matrix used in the orientation calculation. */
   private final float[] mRotationMatrix = new float[16];
 
-  /** Tracks if this device is using the rotation vector sensor or the acc + mag backup sensors. */
-  private boolean mUsingRotationVector = true;
-
   /** Temporary matricies used in the orientation calculation if using the acc + mag backup sensors. */
   private float[] mGravity;
   private float[] mGeomagnetic;
 
   /** Field angle. The offset of the field X axis to due North. */
   private float mFieldBearing;
-
-  /**
-   * The Nexus 7 tablets need a modification to the field orientation.  It was an experimentally
-   * determined formula.  It is a hack to work around some issues, but it does the trick to fix
-   * the values on the Nexus 7 tablet.  It may cause an issue on other devices though.
-   *
-   * The default is to USE this formula as this course is designed for the Nexus 7.
-   */
-  private boolean mUseExperimentallyDeterminedFormula = true;
 
   /**
    * Instantiate the FieldOrientationListener with a listener only. The field
@@ -53,34 +41,6 @@ public class FieldOrientation implements SensorEventListener {
    */
   public FieldOrientation(FieldOrientationListener listener) {
     this(listener, 0);
-  }
-
-
-  /**
-   * Instantiate the FieldOrientationListener with a listener and value for the experimentally
-   * determined formula (see the comments above that member field for more info. The field
-   * offset angle will be set to due North (0 offset).
-   *
-   * @param listener
-   *          Listener that implements FieldOrientationListener that will be
-   *          called with updates.
-   */
-  public FieldOrientation(FieldOrientationListener listener, boolean useExperimentallyDeterminedFormula ) {
-    this(listener, 0);
-    mUseExperimentallyDeterminedFormula = useExperimentallyDeterminedFormula;
-  }
-
-  /**
-   * Construct the FieldOrientation object with a listener and known bearing.
-   *
-   * @param listener
-   *          Listener that implements FieldOrientationListener that will be
-   *          called with updates.
-   * @param fieldBearing
-   */
-  public FieldOrientation(FieldOrientationListener listener, float fieldBearing) {
-    mListener = listener;
-    mFieldBearing = fieldBearing;
   }
 
   /**
@@ -121,18 +81,29 @@ public class FieldOrientation implements SensorEventListener {
     mFieldBearing = fieldBearing;
   }
 
+  /**
+   * Construct the FieldOrientation object with a listener and known bearing.
+   *
+   * @param listener
+   *          Listener that implements FieldOrientationListener that will be
+   *          called with updates.
+   * @param fieldBearing 
+   */
+  public FieldOrientation(FieldOrientationListener listener, float fieldBearing) {
+    mListener = listener;
+    mFieldBearing = fieldBearing;
+  }
+
   /** Begin receiving sensor updates. */
   public void registerListener(Context context) {
     mSensorManager = (SensorManager) context.getSystemService(Activity.SENSOR_SERVICE);
     Sensor rotationVectorSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
     if (rotationVectorSensor != null) {
       Log.d("FieldOrientation", "Rotation vector sensor is present.  Using that option.");
-      mUsingRotationVector = true;
       mSensorManager.registerListener(this, rotationVectorSensor, SensorManager.SENSOR_DELAY_NORMAL);
       return;
     }
     Log.d("FieldOrientation", "Rotation vector is NULL trying accelerometer and magnetometer.");
-    mUsingRotationVector = false;
     // Example from: http://www.codingforandroid.com/2011/01/using-orientation-sensors-simple.html
     Sensor accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     Sensor magnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
@@ -161,7 +132,7 @@ public class FieldOrientation implements SensorEventListener {
    *          at 0 degrees.
    */
   public void setCurrentFieldHeading(double currentFieldHeading) {
-    mFieldBearing = getRevisedAzimuth() + (float) currentFieldHeading;
+    mFieldBearing = mOrientationValues[0] + (float) currentFieldHeading;
   }
 
   @Override
@@ -203,7 +174,7 @@ public class FieldOrientation implements SensorEventListener {
    * Sends the onSensorChanged event to the FieldOrientationListener.
    */
   private void dispatchOnSensorChangedEvent() {
-    float fieldHeading = mFieldBearing - getRevisedAzimuth();
+    float fieldHeading = mFieldBearing - mOrientationValues[0];
     fieldHeading = normalizeAngle(fieldHeading);
     mListener.onSensorChanged(fieldHeading, mOrientationValues);
   }
@@ -223,27 +194,6 @@ public class FieldOrientation implements SensorEventListener {
     return angle;
   }
 
-
-  /**
-   * Calculates the Azimuth based on the orientation values.
-   * @return Azimuth (assuming the device is in portrait)
-   */
-  private float getRevisedAzimuth() {
-    float revisedAzimuth = mOrientationValues[0];
-    if (mUsingRotationVector && mUseExperimentallyDeterminedFormula) {
-      // I have absolutely no idea why, how, or when the rotation vector sensor changed the way it works.
-      // BUT this seems to be a solution to the problem to accurately find azimuth now.
-      revisedAzimuth = Math.abs(mOrientationValues[0]) + Math.abs(mOrientationValues[2]);
-      if (mOrientationValues[2] > 0) {
-        revisedAzimuth *= -1;
-      }
-    } else {
-      // No crazy math needed for the acc + mag backup sensors.
-    }
-
-    return revisedAzimuth;
-  }
-
   // Other required methods from the LocationListener.
   @Override
   public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -253,14 +203,5 @@ public class FieldOrientation implements SensorEventListener {
   /** Return the field bearing used in the calculation. */
   public float getFieldBearing() {
     return mFieldBearing;
-  }
-
-
-  public boolean isUsingExperimentallyDeterminedFormula() {
-    return mUseExperimentallyDeterminedFormula;
-  }
-
-  public void setUseExperimentallyDeterminedFormula(boolean useExperimentallyDeterminedFormula) {
-    mUseExperimentallyDeterminedFormula = useExperimentallyDeterminedFormula;
   }
 }
