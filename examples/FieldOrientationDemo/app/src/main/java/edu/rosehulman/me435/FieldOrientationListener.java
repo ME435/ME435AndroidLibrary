@@ -1,4 +1,4 @@
-package edu.rosehulman.fieldorientationdemo.edu.rosehulman.me435;
+package edu.rosehulman.me435;
 
 /**
  * In order to use the FieldOrientation class you must implement the

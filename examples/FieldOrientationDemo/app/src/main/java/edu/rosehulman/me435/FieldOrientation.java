@@ -1,4 +1,4 @@
-package edu.rosehulman.fieldorientationdemo.edu.rosehulman.me435;
+package edu.rosehulman.me435;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,9 +23,6 @@ public class FieldOrientation implements SensorEventListener {
 
   /** Temporary matrix used in the orientation calculation. */
   private final float[] mRotationMatrix = new float[16];
-
-  /** Tracks if this device is using the rotation vector sensor or the acc + mag backup sensors. */
-  private boolean mUsingRotationVector = true;
 
   /** Temporary matricies used in the orientation calculation if using the acc + mag backup sensors. */
   private float[] mGravity;
@@ -103,12 +100,10 @@ public class FieldOrientation implements SensorEventListener {
     Sensor rotationVectorSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
     if (rotationVectorSensor != null) {
       Log.d("FieldOrientation", "Rotation vector sensor is present.  Using that option.");
-      mUsingRotationVector = true;
       mSensorManager.registerListener(this, rotationVectorSensor, SensorManager.SENSOR_DELAY_NORMAL);
       return;
     }
     Log.d("FieldOrientation", "Rotation vector is NULL trying accelerometer and magnetometer.");
-    mUsingRotationVector = false;
     // Example from: http://www.codingforandroid.com/2011/01/using-orientation-sensors-simple.html
     Sensor accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     Sensor magnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
@@ -137,7 +132,7 @@ public class FieldOrientation implements SensorEventListener {
    *          at 0 degrees.
    */
   public void setCurrentFieldHeading(double currentFieldHeading) {
-    mFieldBearing = getRevisedAzimuth() + (float) currentFieldHeading;
+    mFieldBearing = mOrientationValues[0] + (float) currentFieldHeading;
   }
 
   @Override
@@ -179,7 +174,7 @@ public class FieldOrientation implements SensorEventListener {
    * Sends the onSensorChanged event to the FieldOrientationListener.
    */
   private void dispatchOnSensorChangedEvent() {
-    float fieldHeading = mFieldBearing - getRevisedAzimuth();
+    float fieldHeading = mFieldBearing - mOrientationValues[0];
     fieldHeading = normalizeAngle(fieldHeading);
     mListener.onSensorChanged(fieldHeading, mOrientationValues);
   }
@@ -197,27 +192,6 @@ public class FieldOrientation implements SensorEventListener {
     while (angle > 180.0)
       angle -= 360.0;
     return angle;
-  }
-
-
-  /**
-   * Calculates the Azimuth based on the orientation values.
-   * @return Azimuth (assuming the device is in portrait)
-   */
-  private float getRevisedAzimuth() {
-    float revisedAzimuth = mOrientationValues[0];
-    if (mUsingRotationVector) {
-      // I have absolutely no idea why, how, or when the rotation vector sensor changed the way it works.
-      // BUT this seems to be a solution to the problem to accurately find azimuth now.
-      revisedAzimuth = Math.abs(mOrientationValues[0]) + Math.abs(mOrientationValues[2]);
-      if (mOrientationValues[2] > 0) {
-        revisedAzimuth *= -1;
-      }
-    } else {
-      // No crazy math needed for the acc + mag backup sensors.
-    }
-
-    return revisedAzimuth;
   }
 
   // Other required methods from the LocationListener.

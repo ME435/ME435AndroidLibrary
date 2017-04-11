@@ -1,4 +1,4 @@
-package edu.rosehulman.fieldorientationdemo;
+package edu.rosehulman.fieldorientationdemo2;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
