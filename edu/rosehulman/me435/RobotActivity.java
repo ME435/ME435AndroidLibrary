@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.view.WindowManager;
 
-import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -58,49 +57,12 @@ public class RobotActivity extends AccessoryActivity implements FieldGpsListener
   /** Headings are between -180 and 180, when no heading is given use this. */
   public static final double NO_HEADING = 360.0;
 
-  /** Sometimes the GPS doesn't give headings, and sometimes the sensor heading
-   * is just plain wrong. In that case, the best guess you've got is to use the
-   * last two GPS readings and calculate a heading from the X and Y values. This
-   * is sometimes useful as a backup plan. */
-  protected double mCurrentCalculatedGpsHeading;
-
-  /** Current distance of the GPS reading to 0, 0. */
-  protected double mCurrentGpsDistance;
-
-  /** Array that holds every GPS X value ever read. */
-  protected ArrayList<Double> mSavedGpsXValues = new ArrayList<Double>();
-
-  /** Array that holds every GPS Y value ever read. */
-  protected ArrayList<Double> mSavedGpsYValues = new ArrayList<Double>();
-
-  /** Array that holds every GPS heading value ever read. */
-  protected ArrayList<Double> mSavedGpsHeadings = new ArrayList<Double>();
-
-  /** Array that holds every GPS distance away from 0, 0. */
-  protected ArrayList<Double> mSavedGpsDistances = new ArrayList<Double>();
-
-  /** Array that holds every calculated GPS heading. Note, this one does NOT come
-   * from the GPS, it's simple math on the last two GPS points. */
-  protected ArrayList<Double> mSavedCalculatedGpsHeadings = new ArrayList<Double>();
-
-  /** Counter that track how many GPS reading in a row farther away. */
-  protected int mGettingFartherAwayCounter = 0;
-
-  /** When testing you can speak all GPS readings. Set to false to turn off. */
-  protected boolean mTalkingGps = false;
-  
-  /** Tracks when the TalkingGps last spoke to avoid cutting off debugging info. */
-  protected long mLastTalkTime = 0;
-
   // Movement
   /** Most recent sensor heading (updates MANY times per second). */
   protected double mCurrentSensorHeading;
 
   /** Boolean set to true when the robot is moving forward. */
   protected boolean mMovingForward = false;
-
-  /** Boolean set to true when the robot is moving forward in a straight line. */
-  protected boolean mMovingStraight = false;
 
   /** Guess at the XY value based on the last GPS reading and current speed. */
   protected double mGuessX, mGuessY;
@@ -140,7 +102,7 @@ public class RobotActivity extends AccessoryActivity implements FieldGpsListener
       mGuessY += DEFAULT_SPEED_FT_PER_SEC * (double) LOOP_INTERVAL_MS / 1000.0 * Math.sin(Math.toRadians(mCurrentSensorHeading));
     }
     // Do more in subclass.
-  };
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -153,99 +115,22 @@ public class RobotActivity extends AccessoryActivity implements FieldGpsListener
     mTts = new TextToSpeechHelper(this);
   }
 
-  public void setTeamToRed(boolean isRed) {
-    float[] originToXAxisLocation = new float[2];
-    Location redHome = new Location("Fake");
-    redHome.setLatitude(RED_HOME_LATITUDE);
-    redHome.setLongitude(RED_HOME_LONGITUDE);
-    Location blueHome = new Location("Fake");
-    blueHome.setLatitude(BLUE_HOME_LATITUDE);
-    blueHome.setLongitude(BLUE_HOME_LONGITUDE);
-    if (isRed) {
-      mFieldGps.setLocationOnXAxis(blueHome);
-      mFieldGps.setOriginLocation(redHome);
-      // Borrowing skills from a FieldOrientation constructor.
-      Location.distanceBetween(RED_HOME_LATITUDE, RED_HOME_LONGITUDE, BLUE_HOME_LATITUDE, BLUE_HOME_LONGITUDE,
-          originToXAxisLocation);
-    } else {
-      // Swap red and blue.
-      mFieldGps.setLocationOnXAxis(redHome);
-      mFieldGps.setOriginLocation(blueHome);
-      Location.distanceBetween(BLUE_HOME_LATITUDE, BLUE_HOME_LONGITUDE, RED_HOME_LATITUDE, RED_HOME_LONGITUDE,
-          originToXAxisLocation);
-    }
-    mFieldOrientation.setFieldBearing(originToXAxisLocation[1]);
-  }
-
   @Override
   public void onLocationChanged(double x, double y, double heading,
       Location location) {
     mGpsCounter++;
     mCurrentGpsX = x;
     mCurrentGpsY = y;
-    mCurrentGpsHeading = NO_HEADING;
     mGuessX = mCurrentGpsX;
     mGuessY = mCurrentGpsY;
 
-    mCurrentGpsDistance = NavUtils.getDistance(mCurrentGpsX, mCurrentGpsY, 0, 0); // TODO: Update this code to allow for targets other than 0, 0
-    int lastGpsReadingIndex = mSavedGpsDistances.size() - 1;
-    double oldGpsDistance = lastGpsReadingIndex < 0 ? 1000 : mSavedGpsDistances.get(lastGpsReadingIndex);
-    if (mCurrentGpsDistance > oldGpsDistance) {
-      mGettingFartherAwayCounter++;
-    } else if (mCurrentGpsDistance < oldGpsDistance) {
-      mGettingFartherAwayCounter = 0;
-    }
-
-    // Not sure if calculated GPS Heading is useful, but here it is.
-    // Simply uses the last two GPS readings to determine the heading.
-    if (mSavedGpsXValues.size() > 0) {
-      double oldGpsX = mSavedGpsXValues.get(mSavedGpsXValues.size() - 1);
-      double oldGpsY = mSavedGpsYValues.get(mSavedGpsYValues.size() - 1);
-      mCurrentCalculatedGpsHeading = NavUtils.getTargetHeading(oldGpsX, oldGpsY, mCurrentGpsX, mCurrentGpsY);
-    } else {
-      mCurrentCalculatedGpsHeading = NO_HEADING;
-    }
-
-    // If the vehicle is currently going straight and heading is present.
+    mCurrentGpsHeading = NO_HEADING;
     if (heading < 180.0 && heading > -180.0) {
       mCurrentGpsHeading = heading;
-      if (mMovingStraight) {
-        mFieldOrientation.setCurrentFieldHeading(mCurrentGpsHeading);
-        if (mTalkingGps && (System.currentTimeMillis() - mLastTalkTime > 3000)) {
-		  mLastTalkTime = System.currentTimeMillis();
-          mTts.speak("" + (int) heading);
-        }
-      }
-    } else {
-      // Consider reseting the sensor heading using the calculated heading.
-      int calculatedGpsTrustThresholdCount = 3;
-      if (mMovingStraight && mSavedCalculatedGpsHeadings.size() > calculatedGpsTrustThresholdCount) {
-        boolean resetSensorHeadingToCalculatedGpsHeading = true;
-        double calculatedGpsTrustThresholdAngle = 15.0;
-        double oldCalculatedGpsHeading;
-        for (int i = 0; i < calculatedGpsTrustThresholdCount; i++) {
-          oldCalculatedGpsHeading = mSavedCalculatedGpsHeadings.get(mSavedGpsXValues.size() - i - 1);
-          if (Math.abs(mCurrentCalculatedGpsHeading - oldCalculatedGpsHeading) > calculatedGpsTrustThresholdAngle) {
-            resetSensorHeadingToCalculatedGpsHeading = false;
-            break;
-          }
-        }
-        if (resetSensorHeadingToCalculatedGpsHeading) {
-          mFieldOrientation.setCurrentFieldHeading(mCurrentCalculatedGpsHeading);
-          // Note, I could take an average of the last few readings instead.
-          if (mTalkingGps) {
-            mTts.speak("Calculated " + (int) heading);
-          }
-        }
+      if (mMovingForward) {
+        mFieldOrientation.setCurrentFieldHeading(mCurrentGpsHeading); // OPTIONAL
       }
     }
-
-    // Save all the GPS info.
-    mSavedGpsXValues.add(mCurrentGpsX);
-    mSavedGpsYValues.add(mCurrentGpsY);
-    mSavedGpsHeadings.add(mCurrentGpsHeading);
-    mSavedGpsDistances.add(mCurrentGpsDistance);
-    mSavedCalculatedGpsHeadings.add(mCurrentCalculatedGpsHeading);
   }
 
   @Override
@@ -298,8 +183,7 @@ public class RobotActivity extends AccessoryActivity implements FieldGpsListener
   public void sendWheelSpeed(int leftDutyCycle, int rightDutyCycle) {
     mLeftDutyCycle = leftDutyCycle;
     mRightDutyCycle = rightDutyCycle;
-    // The member variable has a sign, parameter (FORWARD, BRAKE, REVERSE) used
-    // for communication.
+    // Convert the signed duty cycle into a properly formatted Arduino message.
     leftDutyCycle = Math.abs(leftDutyCycle);
     rightDutyCycle = Math.abs(rightDutyCycle);
     String leftMode = WHEEL_MODE_BRAKE;
@@ -314,9 +198,7 @@ public class RobotActivity extends AccessoryActivity implements FieldGpsListener
     } else if (mRightDutyCycle > 0) {
       rightMode = WHEEL_MODE_FORWARD;
     }
-    // Set member variables to track movement type.
     mMovingForward = mLeftDutyCycle > 30 && mRightDutyCycle > 30;
-    mMovingStraight = mLeftDutyCycle > 100 && mRightDutyCycle > 100;
     String command = "WHEEL SPEED " + leftMode + " " + leftDutyCycle + " " +
         rightMode + " " + rightDutyCycle;
     sendCommand(command);
@@ -324,11 +206,11 @@ public class RobotActivity extends AccessoryActivity implements FieldGpsListener
 
   // --------------- Audio Out for debugging -----------------------------
 
-  /** Simple wrapper to allow subclasses to call speak instead of mTts.speak.
-   * Pretty optional, as it doesn't do much. Just showing the function is
-   * available.
+  /**
+   * Simple wrapper to allow subclasses to call speak instead of mTts.speak.
    * 
-   * @param messageToSpeak String to speak. */
+   * @param messageToSpeak String to speak.
+   */
   public void speak(String messageToSpeak) {
     mTts.speak(messageToSpeak);
   }
