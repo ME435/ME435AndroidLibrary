@@ -88,13 +88,6 @@ public class RobotActivity extends AccessoryActivity implements FieldGpsListener
   /** Magic tool we use to execute code after a delay. */
   protected Handler mCommandHandler = new Handler();
 
-  // Field GPS locations
-  /** Latitude and Longitude values of the field home bases. */
-  public static final double RED_HOME_LATITUDE = 39.485297; // Middle of the end zone near the SRC
-  public static final double RED_HOME_LONGITUDE = -87.325922;
-  public static final double BLUE_HOME_LATITUDE = 39.485549; // Middle of the end zone near the tennis courts
-  public static final double BLUE_HOME_LONGITUDE = -87.324796;
-  
   /** Function called 10 times per second. */
   public void loop() {
     if (mMovingForward) {
@@ -110,8 +103,8 @@ public class RobotActivity extends AccessoryActivity implements FieldGpsListener
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
     // Assume you are on the red team to start the app (can be changed later).
-    mFieldGps = new FieldGps(this, RED_HOME_LATITUDE, RED_HOME_LONGITUDE, BLUE_HOME_LATITUDE, BLUE_HOME_LONGITUDE);
-    mFieldOrientation = new FieldOrientation(this, BLUE_HOME_LATITUDE, BLUE_HOME_LONGITUDE, RED_HOME_LATITUDE, RED_HOME_LONGITUDE);
+    mFieldGps = new FieldGps(this);
+    mFieldOrientation = new FieldOrientation(this);
     mTts = new TextToSpeechHelper(this);
   }
 
